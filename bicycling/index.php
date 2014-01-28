@@ -7,6 +7,8 @@ $club_name = "/r/".$simple_name;
 <!DOCTYPE html>
 <head>
 <title><?php echo $club_name ?> strava monthly tally</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">	
 </head>
 <body>
