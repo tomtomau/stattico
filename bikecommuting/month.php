@@ -19,7 +19,7 @@ $club_name = "/r/".$simple_name;
 	?>
 	<hr>
 	<div>
-	<p><strong>View <a href="http://statti.co/bicycling/">/r/bicycling on statti.co</a> instead</strong> | Built with <a href="http://getbootstrap.com">Bootstrap</a> by Tom Newby (<a href="http://reddit.com/u/tomtomau">/u/tomtomau</a>)</p>
+	<p><strong>View <a href="../bicycling/">/r/bicycling on statti.co</a> instead</strong> | Built with <a href="http://getbootstrap.com">Bootstrap</a> by Tom Newby (<a href="http://reddit.com/u/tomtomau">/u/tomtomau</a>)</p>
 	</div>
 	</div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js">

@@ -15,7 +15,7 @@ $club_name = "/r/".$simple_name;
 		<a href="../"><small>< back to statti.co</small></a></h1>
 	<blockquote>
 		It had been considered that a monthly/yearly/whatever-ly tally for the
-		<a href="http://strava.com/clubs/25148">strava group</a> would prove handy 
+		<a href="http://strava.com/clubs/<?php echo $club_id ?>">strava group</a> would prove handy 
 		- a cool way to show how many miles/km's we were getting in each month as we make our way to work and such! Find out more about this on the <a href="">reddit post</a>.
 	</blockquote>
 	<hr>
@@ -25,7 +25,7 @@ $club_name = "/r/".$simple_name;
 	?>
 	<hr>
 	<div>
-	<p><strong>View <a href="http://statti.co/bicycling/">/r/bicycling on statti.co</a> instead</strong> | Built with <a href="http://getbootstrap.com">Bootstrap</a> by Tom Newby (<a href="http://reddit.com/u/tomtomau">/u/tomtomau</a>)</p>
+	<p><strong>View <a href="../bicycling/">/r/bicycling on statti.co</a> instead</strong> | Built with <a href="http://getbootstrap.com">Bootstrap</a> by Tom Newby (<a href="http://reddit.com/u/tomtomau">/u/tomtomau</a>)</p>
 	</div>
 	</div>
 
