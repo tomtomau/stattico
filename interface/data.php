@@ -50,7 +50,7 @@ if(!isset($_GET["date"])){
 			</div>
 			<div class="col-md-4 col-sm-6 text-center">
 				<h1><small class="text-muted">AVERAGE ATHLETE DISTANCE</small><br><br>
-					<?php echo $data{"average_distance_athletes"} ?> km each
+					<?php echo number_format($data{"average_distance_athletes"}/100, 2) ?> km each
 				</h1>
 			</div>
 		</div>
