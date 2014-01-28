@@ -1,4 +1,7 @@
 <?php
+/**
+*	File that handles the interface of strava dat
+*/
 include("includes.php");
 
 function createConnection($db_params){
@@ -206,7 +209,6 @@ function syncActivities($club_id, $db_params, $access_token){
 	// Strava API url
 	$url = "https://www.strava.com/api/v3/clubs/$club_id/activities?access_token=$access_token&after=$after&per_page=200";
 	$activities_json = interact($url);
-	var_dump($activities_json);
 	// setup database connection
 	$db = createConnection($db_params);
 	// count number of activities added
@@ -239,9 +241,7 @@ function syncActivities($club_id, $db_params, $access_token){
 	return $return_array;
 }
 function syncMonth($club_id, $db_params, $access_token){
-
 	$sync_output = syncActivities($club_id, $db_params, $access_token);
-
 	if($sync_output{"count"}){
 		echo($sync_output{"log"});
 		// New activities were added
@@ -257,13 +257,36 @@ function syncMonth($club_id, $db_params, $access_token){
 		// function notify()
 	}else{
 		// nothing happened
-
 		return 0;
 	}
 }
 
-syncMonth(165, $db_params, $access_token);
-syncMonth(25148, $db_params, $access_token);
+
+function listTally($club_id, $db_params){
+	try{
+		$db = createConnection($db_params);
+		$query = "SELECT date, total_distance, total_rides, timestamp FROM facts WHERE club_id = ?";
+		$statement = $db->prepare($query);
+		$statement->execute(array($club_id));
+		$results = $statement->fetchAll(PDO::FETCH_ASSOC);
+		return $results;
+	}catch(PDOException $e){
+		var_dump($e);
+	}
+}
+
+function monthData($club_id, $db_params, $date){
+	try{
+		$db = createConnection($db_params);
+		$query = "SELECT * FROM facts WHERE club_id = ? and date = ?";
+		$statement = $db->prepare($query);
+		$statement->execute(array($club_id, $date));
+		$results = $statement->fetch(PDO::FETCH_ASSOC);
+		return $results;
+	}catch(PDOException $e){
+		var_dump($e);
+	}
+}
 
 
 ?>

@@ -1,6 +1,6 @@
 <?php
 include("../interface/strava.php");
-$club_id = 25148;
+$club_id = 165;
 $simple_name = "bikecommuting";
 $club_name = "/r/".$simple_name;
 ?>
@@ -25,7 +25,7 @@ $club_name = "/r/".$simple_name;
 	?>
 	<hr>
 	<div>
-	<p><strong>View <a href="http://statti.co/bicycling/">/r/bicycling on statti.co</a> instead</strong> | Built with <a href="http://getbootstrap.com">Bootstrap</a> by Tom Newby (<a href="http://reddit.com/u/tomtomau">/u/tomtomau</a>)</p>
+	<p><strong>View <a href="http://statti.co/bikecommuting">/r/bikecommuting on statti.co</a> instead</strong> | Built with <a href="http://getbootstrap.com">Bootstrap</a> by Tom Newby (<a href="http://reddit.com/u/tomtomau">/u/tomtomau</a>)</p>
 	</div>
 	</div>
 
