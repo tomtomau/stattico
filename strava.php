@@ -1,7 +1,7 @@
 <?php
 include("includes.php");
 
-function createConnection($db_user, $db_pass, $db_name, $hostname){
+function createConnection($db_params){
     // Connect to database
     try {
         /* 
@@ -10,8 +10,8 @@ function createConnection($db_user, $db_pass, $db_name, $hostname){
          *  - use native PDO mysql prepared statements
          *  - show exception errors
          */
-        $db = new PDO("mysql:host=".$hostname.";dbname=".$db_name.";charset=utf8", 
-            $db_user, $db_pass, array(
+        $db = new PDO("mysql:host=".$db_params{"host"}.";dbname=".$db_params{"name"}.";charset=utf8", 
+            $db_params{"user"}, $db_params{"pass"}, array(
                 PDO::ATTR_PERSISTENT => true,
                 PDO::ATTR_EMULATE_PREPARES => false,
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
@@ -114,19 +114,20 @@ function interact($url){
     return json_decode($result);
 }
 
-function syncMonth($club_id, $db_user, $db_pass, $db_name, $hostname, $access_token){
+function syncActivities($club_id, $db_params, $access_token){
 	// Work out beginning of this month
 	$date_string = date("Y-m-01");
 	// get epoch time
 	$after = strtotime($date_string);
-	
 	// Strava API url
 	$url = "https://www.strava.com/api/v3/clubs/$club_id/activities?access_token=$access_token&after=$after&per_page=200";
 	$activities_json = interact($url);
 
-	$db = createConnection($db_user, $db_pass, $db_name, $hostname);
-	// for each activity
+	// setup database connection
+	$db = createConnection($db_params);
+	// count number of activities added
 	$count = 0;
+	// create a log of what's been added
 	$log = "";
 	foreach ($activities_json as $activity_json){
 		$activity = new Activity($activity_json, $club_id);
@@ -151,14 +152,18 @@ function syncMonth($club_id, $db_user, $db_pass, $db_name, $hostname, $access_to
 	$return_array = array("count"=>$count, "log"=>$log);
 	return $return_array;
 }
-
-$sync_output = syncMonth(165, $db_user, $db_pass, $db_name, $hostname, $access_token);
-if($sync_output{"count"}){
-	echo("updated");
-}else{
-	echo("nothing");
+function syncMonth($club_id, $db_params, $access_token){
+	$sync_output = syncActivities($club_id, $db_params, $access_token);
+	if($sync_output{"count"}){
+		echo($sync_output{"log"});
+		// New activities added
+		// Update fact tables
+		// Email Log Notifying Update
+		// function notify()
+	}else{
+		echo("nothing");
+	}
 }
-
-
+syncMonth(165, $db_params, $access_token);
 
 ?>
