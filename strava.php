@@ -63,11 +63,11 @@ class Activity
 		echo($this->id . " - " . $this->distance." at ". $this->datetime . "<br>");
 	}
 
-	public function in_database($db){
+	public function in_database($db, $club_id){
 		try{
-			$query = "SELECT COUNT(*) FROM activities WHERE id = ?";
+			$query = "SELECT COUNT(*) FROM activities WHERE activity_id = ? AND club_id = ?";
 			$statement = $db->prepare($query);
-			$statement->execute(array($this->id));
+			$statement->execute(array($this->id, $club_id));
 			$count = $statement->fetch(PDO::FETCH_NUM)[0];
 			return $count;
 		}catch(PDOException $e){
@@ -76,13 +76,53 @@ class Activity
 	}
 	public function addToDatabase($db){
 		try{
-			$query = "INSERT INTO activities (id, club_id, athlete_id, distance, datetime) VALUES (?, ?, ?, ?, ?)";
+			$query = "INSERT INTO activities (activity_id, club_id, athlete_id, distance, datetime) VALUES (?, ?, ?, ?, ?)";
 			$statement = $db->prepare($query);
 			$statement->execute(array($this->id, $this->club_id, $this->athlete_id, $this->distance, $this->datetime));
 			return true;
 		}catch(PDOException $e){
 			var_dump($e);
 		}
+	}
+}
+
+class Facts
+{
+	public $before = null;
+	public $after = null;
+	public $total_distance = null;
+	public $total_athletes = null;
+	public $average_distance = null;
+	public $average_daily_rides = null;
+	public $average_distance_athlete = null;
+	/**
+	*	Generate the data to then go into a facts table
+	*/
+	public function generateFacts($db, $before, $after, $club_id){
+		$this->before = $before;
+		$this->after = $after;
+		try{
+			$query = "SELECT SUM(distance) as total_distance, 
+					COUNT(*) as total_rides, 
+					AVG(distance) as average_distance 
+					FROM activities WHERE club_id = ? AND
+					datetime > ? AND datetime < ?
+					GROUP BY club_id";
+			$statement = $db->prepare($query);
+			$statement->execute(array($club_id, $after, $before));
+			$query_results = $statement->fetch(PDO::FETCH_ASSOC);
+			var_dump($query_results);
+		}catch(PDOException $e){
+			var_dump($e);
+		}
+	}
+
+	private function calculateTotals($db){
+		
+	}
+
+	private function calculateAverages($db){
+		return 0;
 	}
 }
 
@@ -136,12 +176,14 @@ function syncActivities($club_id, $db_params, $access_token){
 			continue;
 		}
 		// if id already in db, pass
-		if($activity->in_database($db)){
+		if($activity->in_database($db, $club_id)){
 			continue;
 		}else{
 			try{
+				// add this activity to the activity database
 				$activity->addToDatabase($db);
-				$log .= "New Activity <a href='http://www.strava.com/activities/".$activity->id."'>here</a><br>";
+				// add to the log
+				$log .= "New Activity <a href='http://www.strava.com/activities/".$activity->id."'>here</a> for club $club_id<br>";
 				$count++;
 			}catch(PDOException $e){
 				$log = $e;
@@ -153,17 +195,38 @@ function syncActivities($club_id, $db_params, $access_token){
 	return $return_array;
 }
 function syncMonth($club_id, $db_params, $access_token){
+
 	$sync_output = syncActivities($club_id, $db_params, $access_token);
+
 	if($sync_output{"count"}){
 		echo($sync_output{"log"});
-		// New activities added
+		// New activities were added
+		$db = createConnection($db_params);
 		// Update fact tables
+		$fact_obj = new Facts();
+
+		$after = date("Y-m-01");
+		$before= date("Y-m-t");
+		$fact_obj->generateFacts($db, $before, $after, $club_id);
+		//$fact_obj->updateFacts($db, $club_id);
 		// Email Log Notifying Update
 		// function notify()
 	}else{
-		echo("nothing");
+		// nothing happened
+$db = createConnection($db_params);
+		// Update fact tables
+		$fact_obj = new Facts();
+
+		$after = date("Y-m-01");
+		$before= date("Y-m-t");
+		$fact_obj->generateFacts($db, $before, $after, $club_id);
+		return 0;
+
 	}
 }
+
 syncMonth(165, $db_params, $access_token);
+syncMonth(25148, $db_params, $access_token);
+
 
 ?>
