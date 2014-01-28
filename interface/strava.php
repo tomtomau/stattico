@@ -23,13 +23,13 @@ function createConnection($db_params){
 
 class Activity
 {
-	public $id = null;
-	public $distance = null;
-	public $club_id = null;
-	public $athlete_id = null;
-	public $datetime = null;
+	var $id = null;
+	var $distance = null;
+	var $club_id = null;
+	var $athlete_id = null;
+	var $datetime = null;
 
-	public function __construct($object, $club_id){
+	function __construct($object, $club_id){
 		if(isset($object->{"id"})){
 			$this->id = $object->{"id"};
 		}
@@ -52,29 +52,29 @@ class Activity
 	/**
 	*	Check whether this activity is valid
 	*/
-	public function is_valid(){
+	function is_valid(){
 		if(is_null($this->id)||is_null($this->distance)||is_null($this->club_id)||is_null($this->athlete_id)||is_null($this->datetime)){
 			return false;
 		}
 		return true;
 	}
 
-	public function printme(){
+	function printme(){
 		echo($this->id . " - " . $this->distance." at ". $this->datetime . "<br>");
 	}
 
-	public function in_database($db, $club_id){
+	function in_database($db, $club_id){
 		try{
 			$query = "SELECT COUNT(*) FROM activities WHERE activity_id = ? AND club_id = ?";
 			$statement = $db->prepare($query);
 			$statement->execute(array($this->id, $club_id));
-			$count = $statement->fetch(PDO::FETCH_NUM)[0];
-			return $count;
+			$count = $statement->fetch(PDO::FETCH_NUM);
+			return $count[0];
 		}catch(PDOException $e){
 			var_dump($e);
 		}
 	}
-	public function addToDatabase($db){
+	function addToDatabase($db){
 		try{
 			$query = "INSERT INTO activities (activity_id, club_id, athlete_id, distance, datetime) VALUES (?, ?, ?, ?, ?)";
 			$statement = $db->prepare($query);
@@ -88,18 +88,18 @@ class Activity
 
 class Facts
 {
-	public $club_id = null;
-	public $before = null;
-	public $after = null;
-	public $total_distance = null;
-	public $total_athletes = null;
-	public $total_rides = null;
-	public $average_distance = null;
-	public $average_daily_rides = null;
-	public $average_distance_athletes = null;
+	var $club_id = null;
+	var $before = null;
+	var $after = null;
+	var $total_distance = null;
+	var $total_athletes = null;
+	var $total_rides = null;
+	var $average_distance = null;
+	var $average_daily_rides = null;
+	var $average_distance_athletes = null;
 
 
-	public function updateFacts($db, $before, $after, $club_id){
+function updateFacts($db, $before, $after, $club_id){
 		$this->club_id = $club_id;
 		$this->before = $before;
 		$this->after = $after;
@@ -123,13 +123,13 @@ class Facts
 	/**
 	*	Generate the data to then go into a facts table
 	*/
-	private function generateFacts($db){
+	function generateFacts($db){
 		$this->calculateTotals($db);
 		$this->calculateAggregates($db);
 		$this->calculateDerived();
 	}
 
-	private function calculateTotals($db){
+	function calculateTotals($db){
 		try{
 			$query = "SELECT SUM(distance) as total_distance, 
 						COUNT(*) as total_rides, 
@@ -148,21 +148,22 @@ class Facts
 		}
 	}
 
-	private function calculateAggregates($db){
+	function calculateAggregates($db){
 		try{
 			// Calculate total athletes
 			$query = "SELECT COUNT(DISTINCT athlete_id) as total_athletes FROM activities 
 			WHERE club_id = ? AND datetime > ? AND datetime < ?";
 			$statement = $db->prepare($query);
 			$statement->execute(array($this->club_id, $this->after, $this->before));
-			$this->total_athletes = $statement->fetch(PDO::FETCH_NUM)[0];
+			$results = $statement->fetch(PDO::FETCH_NUM);
+			$this->total_athletes = $results[0];
 
 		}catch(PDOException $e){
 			var_dump($e);
 		}
 	}
 
-	private function calculateDerived(){
+	function calculateDerived(){
 		$this->average_distance_athletes = $this->total_distance / $this->total_athletes;
 		$days = 1+(strtotime($this->before) - strtotime($this->after))/60/60/24;
 		$this->average_daily_rides = floor($this->total_rides / $days);
@@ -205,7 +206,7 @@ function syncActivities($club_id, $db_params, $access_token){
 	// Strava API url
 	$url = "https://www.strava.com/api/v3/clubs/$club_id/activities?access_token=$access_token&after=$after&per_page=200";
 	$activities_json = interact($url);
-
+	var_dump($activities_json);
 	// setup database connection
 	$db = createConnection($db_params);
 	// count number of activities added
@@ -256,13 +257,7 @@ function syncMonth($club_id, $db_params, $access_token){
 		// function notify()
 	}else{
 		// nothing happened
-$db = createConnection($db_params);
-		// Update fact tables
-		$fact_obj = new Facts();
 
-		$after = date("Y-m-01");
-		$before= date("Y-m-t");
-		$fact_obj->updateFacts($db, $before, $after, $club_id);
 		return 0;
 	}
 }
