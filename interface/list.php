@@ -1,4 +1,6 @@
 <?php
+include_once("includes.php");
+include_once("strava.php");
 $tally = listTally($club_id, $db_params);
 ?>
 <table class="table table-responsive table-striped">
