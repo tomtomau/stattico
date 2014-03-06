@@ -2,6 +2,7 @@
 include_once("StravaInterface.class.php");
 include_once("Activity.class.php");
 include_once("Facts.class.php");
+include_once("ClubActivity.class.php");
 
 
 
@@ -21,7 +22,7 @@ function syncActivities($club_id, $db_params, $access_token){
 	// create a log of what's been added
 	$log = "";
 	foreach ($activities_json as $activity_json){
-		$activity = new Activity($activity_json, $club_id);
+		$activity = new ClubActivity($activity_json, $club_id);
 		// check activity is valid (proper ids, distances)
 		if(!$activity->is_valid()){
 			continue;
